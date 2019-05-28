@@ -1,5 +1,5 @@
 {
-  "data": [
+  "current_tickers": [
     "SPY",
     "QQQ",
     "MSFT",
@@ -7,26 +7,29 @@
     "GOOG",
     "V",
     "AMZN",
-    "AAPL",
-    "FB",
     "ADBE",
     "CSCO",
-    "NFLX",
     "TQQQ",
-    "EWH",
+    "FB",
+    "AAPL",
+    "NFLX",
     "CRM",
-    "SQ",
-    "CRM",
-    "TSLA",
+    "SQ"
+  ],
+  "previous_tickers": [
     "EWH",
-    "SNAP",
-    "GLOP",
-    "FDUS",
-    "P",
+    "STZ",
+    "M",
     "CROX",
+    "GOOS",
+    "GLOP",
     "CBRE",
     "EWG",
-    "M",
-    "JPM"
+    "TSLA",
+    "FDUS",
+    "JPM",
+    "KWEB",
+    "TWTR",
+    "SNAP"
   ]
 }
