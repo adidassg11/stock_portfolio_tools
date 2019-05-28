@@ -11,7 +11,7 @@ Simply clone the code, then run:
 Navigate to `http://<root_url>/portfolio_viewer/` to see a series of charts with links to detailed technicals for each of the stocks in your `data/portfolio.json` file.
 
 #### To-Do list
-* Add row/section with previously owned stocks
 * Add new column with Dividend
 * Use Django templates
 * Dockerize and prepare for kubernetes?
+* Add dates sold
