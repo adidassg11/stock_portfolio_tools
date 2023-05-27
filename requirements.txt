@@ -1,3 +1,6 @@
 ## The following requirements were added by pip freeze:
-Django==2.0.7
-pytz==2018.5
+Django==4.2.*
+pytz==2023.3
+redis
+urllib3==1.26.6  # this is for the mac issue here: https://stackoverflow.com/questions/62195898/openssl-still-pointing-to-libressl-2-8-3
+yfinance==0.2.*

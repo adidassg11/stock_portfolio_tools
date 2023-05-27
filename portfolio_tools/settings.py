@@ -69,6 +69,22 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'portfolio_tools.wsgi.application'
 
+## DATA LAYER ##
+
+# Caching
+CACHE_TTL = 60 * 1  # Make a super short TTL just for fun
+
+# TODO - update LOCATION to use replicas a-la https://docs.djangoproject.com/en/4.1/topics/cache/#redis
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379",
+        "KEY_PREFIX": "portfolio_tools",
+        "TIMEOUT": CACHE_TTL
+    }
+}
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+SESSION_CACHE_ALIAS = "default"
 
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases

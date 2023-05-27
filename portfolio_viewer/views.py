@@ -1,6 +1,9 @@
 import json
 
+import yfinance as yf
+
 from django.conf import settings
+from django.core.cache import cache
 from django.http import HttpResponse
 
 
@@ -82,3 +85,22 @@ def index(request):
 
     print('html_contents: {}'.format(html_contents))
     return HttpResponse(html_contents)
+
+
+def prices(request):
+    html_contents = '<h1>Current prices</h1>'
+    print('checking cache for msft...')
+    msft_info_data = cache.get('msft')
+    if not msft_info_data:
+        print("no cached results, retrieving...")
+        msft_data = yf.Ticker('MSFT')
+        print('setting cache')
+        msft_info_data = msft_data.info
+        cache.set('msft', msft_data.info)
+        print('successfully cached')
+    else:
+        print('got cached results')
+
+    price = msft_info_data["currentPrice"]
+    print('price:', price)
+    return HttpResponse(html_contents + str(price))
