@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 import json
 
 import yfinance as yf
@@ -15,8 +16,10 @@ def get_tickers():
     portfolio_file = '{0}/data/portfolio.json'.format(settings.BASE_DIR)
     print('Importing data from file: {}'.format(portfolio_file))
 
-    json_stream = open(portfolio_file).read()
-    return json.loads(json_stream)
+    json_stream = open(portfolio_file)
+    json_data = json.load(json_stream)
+    json_stream.close()
+    return json_data
 
 
 def get_ticker_url(ticker, term='short', resource_type='chart'):
@@ -88,19 +91,53 @@ def index(request):
 
 
 def prices(request):
-    html_contents = '<h1>Current prices</h1>'
-    print('checking cache for msft...')
-    msft_info_data = cache.get('msft')
-    if not msft_info_data:
-        print("no cached results, retrieving...")
-        msft_data = yf.Ticker('MSFT')
-        print('setting cache')
-        msft_info_data = msft_data.info
-        cache.set('msft', msft_data.info)
-        print('successfully cached')
-    else:
-        print('got cached results')
+    """
+    Playing with caching
+    - Getting from redis (running natively, locally) is <1ms
+    - Getting from the library is ~250m. Needed to move the timestamps due to lazy loading of data
 
-    price = msft_info_data["currentPrice"]
-    print('price:', price)
-    return HttpResponse(html_contents + str(price))
+    TODO -
+    - Can we async update the frontend so it doesn't take forever to display results?
+    """
+    html_contents = '<h1>Current prices</h1>'
+
+    table_header = "Ticker || Price || is cached? || time to retrive data"  #obv not a real table header
+    html_contents += table_header + "<br><br>"
+
+    print('getting tickers')
+    tickers = get_tickers()
+
+    all_tickers = []
+    for tickers_list in tickers.values():
+        all_tickers.extend(tickers_list)
+
+    ticker_prices_cached = []
+    for ticker in all_tickers:
+        print(ticker)
+        # Check the cache
+        cache_key = "{}_last_price".format(ticker)
+        t1 = datetime.now()
+        ticker_info_data = cache.get(cache_key)
+        t2 = datetime.now()
+        time_to_retrive = (t2 - t1).total_seconds()
+        if ticker_info_data:
+            # TODO - maybe kick off async worker here to update the prices?
+            # print('found ticker info in cache:', ticker)
+            cache.touch(cache_key)
+            price = ticker_info_data.get("currentPrice", None)
+            ticker_prices_cached.append((ticker, price, True, time_to_retrive))
+        else:
+            # print('ticker not in cache, getting and setting')
+            t1 = datetime.now()
+            ticker_data = yf.Ticker(ticker)
+            ticker_info_data = ticker_data.info
+            price = ticker_info_data.get("currentPrice", None)
+            t2 = datetime.now()
+            time_to_retrive = (t2 - t1).total_seconds()
+            cache.set(cache_key, ticker_info_data)
+            ticker_prices_cached.append((ticker, price, False, time_to_retrive))
+
+        html_content_line = "{}<br>".format(ticker_prices_cached[-1])
+        html_contents += html_content_line
+
+    return HttpResponse(html_contents)

@@ -75,6 +75,7 @@ WSGI_APPLICATION = 'portfolio_tools.wsgi.application'
 CACHE_TTL = 60 * 1  # Make a super short TTL just for fun
 
 # TODO - update LOCATION to use replicas a-la https://docs.djangoproject.com/en/4.1/topics/cache/#redis
+# This is the new way of doing it in django 4
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",
